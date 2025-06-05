@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, Numeric, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Numeric, Boolean, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Relationship
+from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
@@ -11,6 +11,8 @@ class User(Base):
     last_name = Column(String(45), nullable=False)
     email = Column(String(45), nullable=False)
     phone_number = Column(String(45), nullable=False)
+
+    reservations = relationship('Reservation', back_populates='user')
 
 
 class Room(Base):
@@ -24,12 +26,17 @@ class Room(Base):
     start_time = Column(DateTime, nullable=True)
     end_time = Column(DateTime, nullable=True)
 
+    reservations = relationship('Reservation', back_populates='room')
+
 
 class Reservation(Base):
     __tablename__ = 'reservation'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, nullable=False)
-    room_id = Column(Integer, nullable=False)
+    user_id = Column(Integer,ForeignKey('user.id'), nullable=False)
+    room_id = Column(Integer, ForeignKey('room.id'), nullable=False)
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
+
+    room = relationship('Room', back_populates='reservations')
+    user = relationship('User', back_populates='reservations')
