@@ -1,21 +1,9 @@
-from flask import Flask, jsonify
-from sqlalchemy.exc import SQLAlchemyError
-from database import SessionLocal
-from models import Room
+from flask import Flask
+from routes.rooms import rooms_bp
 
 app = Flask(__name__)
 
-
-@app.route('/available_rooms')
-def get_rooms():
-    try:
-        with SessionLocal() as session:
-            rooms = session.query(Room).all()
-            available_rooms = [room.room_number for room in rooms if not room.is_reserved]
-            return jsonify(available_rooms)
-
-    except SQLAlchemyError as e:
-        print(f'Database Error: {e}')
+app.register_blueprint(rooms_bp)
 
 
 if __name__ == '__main__':
