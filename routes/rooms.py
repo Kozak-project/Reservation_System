@@ -32,8 +32,12 @@ def get_rooms():
     try:
         with SessionLocal() as session:
             rooms = session.query(Room).all()
-            available_rooms = [room.room_number for room in rooms if not room.is_reserved]
-            return jsonify(available_rooms), 200
+            available_rooms = {}
+            for room in rooms:
+                if not room.is_reserved:
+                    available_rooms[room.room_number] = room.price_per_night
+
+            return jsonify(available_rooms)
     except SQLAlchemyError as e:
         print(f'Database Error: {e}')
         return jsonify({'Error': 'Database error'}), 500
