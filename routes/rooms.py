@@ -7,6 +7,13 @@ from database import SessionLocal
 rooms_bp = Blueprint('rooms', __name__, url_prefix='/rooms')
 
 
+def all_rooms():
+    with SessionLocal() as session:
+        rooms = session.query(Room).all()
+
+        return rooms
+
+
 @rooms_bp.route('/add_room', methods=['POST'])
 def add_room():
     session = SessionLocal()
@@ -19,25 +26,38 @@ def add_room():
         session.add(room)
         session.commit()
         return jsonify({'message': 'Room added successfully'}), 201
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         session.rollback()
-        print(f'Database error: {e}')
         return jsonify({'error': 'Database error'})
     finally:
         session.close()
 
 
-@rooms_bp.route('/available_rooms')
-def get_rooms():
+@rooms_bp.route('/all_rooms')
+def get_all_rooms():
     try:
-        with SessionLocal() as session:
-            rooms = session.query(Room).all()
-            available_rooms = {}
-            for room in rooms:
-                if not room.is_reserved:
-                    available_rooms[room.room_number] = room.price_per_night
-
-            return jsonify(available_rooms)
+        rooms = all_rooms()
+        all_rooms_details = {}
+        for room in rooms:
+            all_rooms_details[room.room_number] = {'price_per_night': float(room.price_per_night),
+                                                   'is_reserved': room.is_reserved,
+                                                   'reserved_by': room.reserved_by,
+                                                   'start_time': room.start_time and room.start_time.isoformat(),
+                                                   'end_time': room.end_time and room.end_time.isoformat()}
+        return jsonify(all_rooms_details)
     except SQLAlchemyError as e:
-        print(f'Database Error: {e}')
+        return jsonify({'error': 'Database error'}), 500
+
+
+@rooms_bp.route('/available_rooms')
+def get_available_rooms():
+    try:
+        rooms = all_rooms()
+        available_rooms = {}
+        for room in rooms:
+            if not room.is_reserved:
+                available_rooms[room.room_number] = room.price_per_night
+
+        return jsonify(available_rooms)
+    except SQLAlchemyError:
         return jsonify({'Error': 'Database error'}), 500
