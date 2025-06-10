@@ -45,7 +45,7 @@ def get_all_rooms():
                                                    'start_time': room.start_time and room.start_time.isoformat(),
                                                    'end_time': room.end_time and room.end_time.isoformat()}
         return jsonify(all_rooms_details)
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         return jsonify({'error': 'Database error'}), 500
 
 
@@ -61,3 +61,21 @@ def get_available_rooms():
         return jsonify(available_rooms)
     except SQLAlchemyError:
         return jsonify({'Error': 'Database error'}), 500
+
+
+@rooms_bp.route('/delete_room/<int:room_id>/', methods=['DELETE'])
+def delete_room(room_id):
+    session = SessionLocal()
+    try:
+        room = session.query(Room).filter(Room.id == room_id).first()
+        if room:
+            session.delete(room)
+            session.commit()
+            return jsonify({'message': f'Room with ID: {room_id} deleted successfully'}), 200
+        else:
+            return jsonify({'message': f'Room with ID: {room_id} not found'}), 404
+    except SQLAlchemyError:
+        session.rollback()
+        return jsonify({'message': 'Database error'}), 500
+    finally:
+        session.close()
