@@ -28,7 +28,7 @@ def add_room():
         return jsonify({'message': 'Room added successfully'}), 201
     except SQLAlchemyError:
         session.rollback()
-        return jsonify({'error': 'Database error'})
+        return jsonify({'Error': 'Database error'})
     finally:
         session.close()
 
@@ -46,7 +46,7 @@ def get_all_rooms():
                                                    'end_time': room.end_time and room.end_time.isoformat()}
         return jsonify(all_rooms_details)
     except SQLAlchemyError:
-        return jsonify({'error': 'Database error'}), 500
+        return jsonify({'Error': 'Database error'}), 500
 
 
 @rooms_bp.route('/available_rooms')
@@ -76,6 +76,6 @@ def delete_room(room_id):
             return jsonify({'message': f'Room with ID: {room_id} not found'}), 404
     except SQLAlchemyError:
         session.rollback()
-        return jsonify({'message': 'Database error'}), 500
+        return jsonify({'Error': 'Database error'}), 500
     finally:
         session.close()
