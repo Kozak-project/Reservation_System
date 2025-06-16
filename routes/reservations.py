@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
-from models import Reservation, User, Room
+from models import Reservation, User
 from database import SessionLocal
 from sqlalchemy.exc import SQLAlchemyError
+from datetime import datetime
 
 
 reservation_bp = Blueprint('reservation', __name__, url_prefix='/reservation')
@@ -18,8 +19,8 @@ def add_reservation():
     email = data['email']
     phone_number = data['phone_number']
     room_id = data['room_id']
-    start_time = data['start_time']
-    end_time = data['end_time']
+    start_time = datetime.fromisoformat(data['start_time'])
+    end_time = datetime.fromisoformat(data['end_time'])
 
     session = SessionLocal()
     try:
@@ -44,7 +45,32 @@ def add_reservation():
         reservation = Reservation(user_id=user.id, room_id=room_id, start_time=start_time, end_time=end_time)
         session.add(reservation)
         session.commit()
-        return jsonify({'Success': 'Reservation has been added'})
+        return jsonify({'Success': 'Reservation has been added'}), 201
+    except SQLAlchemyError:
+        session.rollback()
+        return jsonify({'Error': 'Database error'})
+    finally:
+        session.close()
+
+
+@reservation_bp.route('/find_user/<int:user_id>/')
+def user_reservations(user_id):
+    session = SessionLocal()
+    try:
+        user_reservation = session.query(Reservation).filter(Reservation.user_id == user_id).all()
+        if not user_reservation:
+            return jsonify({'message': f'User: {user_id} does not have reservations or does not exist'})
+
+        result = [
+            {
+                'Room ID': reservation.room_id,
+                'Booked from:': reservation.start_time.isoformat(),
+                'Booked to': reservation.end_time.isoformat()
+            }
+            for reservation in user_reservation
+        ]
+        return jsonify(result)
+
     except SQLAlchemyError:
         session.rollback()
         return jsonify({'Error': 'Database error'})
