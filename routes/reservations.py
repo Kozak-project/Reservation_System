@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models import Reservation, User
+from models import Reservation, User, Room
 from database import SessionLocal
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
@@ -43,6 +43,15 @@ def add_reservation():
             session.flush()
 
         reservation = Reservation(user_id=user.id, room_id=room_id, start_time=start_time, end_time=end_time)
+
+        room = session.query(Room).filter(Room.id == room_id).first()
+
+        if room:
+            room.reserved_by = user_id
+            room.is_reserved = True
+            room.start_time = start_time
+            room.end_time = end_time
+
         session.add(reservation)
         session.commit()
         return jsonify({'Success': 'Reservation has been added'}), 201
