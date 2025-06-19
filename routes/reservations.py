@@ -85,3 +85,30 @@ def user_reservations(user_id):
         return jsonify({'Error': 'Database error'})
     finally:
         session.close()
+
+
+@reservation_bp.route('/update/<int:reservation_id>/', methods=['PUT'])
+def edit_reservation_time(reservation_id):
+    data = request.get_json()
+    start_time = datetime.fromisoformat(data['start_time'])
+    end_time = datetime.fromisoformat(data['end_time'])
+
+    session = SessionLocal()
+    try:
+        reservation = session.query(Reservation).filter(Reservation.id == reservation_id).first()
+        room = session.query(Room).filter(Room.id == reservation.room_id).first()
+        if reservation:
+            reservation.start_time = start_time
+            reservation.end_time = end_time
+            room.start_time = start_time
+            room.end_time = end_time
+        else:
+            return jsonify({'Error': 'reservation not found'})
+
+        session.commit()
+        return jsonify({'Success': 'Reservation has been updated'})
+    except SQLAlchemyError:
+        session.rollback()
+        return jsonify({'Error': 'Database error'})
+    finally:
+        session.close()
