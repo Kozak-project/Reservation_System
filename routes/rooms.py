@@ -21,14 +21,13 @@ def add_room():
         data = request.get_json()
         room_number = data['room_number']
         price_per_night = data['price_per_night']
-        is_reserved = data['is_reserved']
-        room = Room(room_number=room_number, price_per_night=price_per_night, is_reserved=is_reserved)
+        room = Room(room_number=room_number, price_per_night=price_per_night)
         session.add(room)
         session.commit()
         return jsonify({'message': 'Room added successfully'}), 201
     except SQLAlchemyError:
         session.rollback()
-        return jsonify({'Error': 'Database error'})
+        return jsonify({'Error': 'Database error'}), 500
     finally:
         session.close()
 
@@ -39,11 +38,7 @@ def get_all_rooms():
         rooms = all_rooms()
         all_rooms_details = {}
         for room in rooms:
-            all_rooms_details[room.room_number] = {'price_per_night': float(room.price_per_night),
-                                                   'is_reserved': room.is_reserved,
-                                                   'reserved_by': room.reserved_by,
-                                                   'start_time': room.start_time and room.start_time.isoformat(),
-                                                   'end_time': room.end_time and room.end_time.isoformat()}
+            all_rooms_details[room.room_number] = {'price_per_night': float(room.price_per_night)}
         return jsonify(all_rooms_details)
     except SQLAlchemyError:
         return jsonify({'Error': 'Database error'}), 500

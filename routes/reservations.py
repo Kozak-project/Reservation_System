@@ -44,20 +44,12 @@ def add_reservation():
 
         reservation = Reservation(user_id=user.id, room_id=room_id, start_time=start_time, end_time=end_time)
 
-        room = session.query(Room).filter(Room.id == room_id).first()
-
-        if room:
-            room.reserved_by = user_id
-            room.is_reserved = True
-            room.start_time = start_time
-            room.end_time = end_time
-
         session.add(reservation)
         session.commit()
         return jsonify({'Success': 'Reservation has been added'}), 201
     except SQLAlchemyError:
         session.rollback()
-        return jsonify({'Error': 'Database error'})
+        return jsonify({'Error': 'Database error'}), 500
     finally:
         session.close()
 
@@ -68,7 +60,7 @@ def user_reservations(user_id):
     try:
         user_reservation = session.query(Reservation).filter(Reservation.user_id == user_id).all()
         if not user_reservation:
-            return jsonify({'message': f'User: {user_id} does not have reservations or does not exist'})
+            return jsonify({'message': f'User: {user_id} does not have reservations or does not exist'}), 404
 
         result = [
             {
@@ -78,11 +70,11 @@ def user_reservations(user_id):
             }
             for reservation in user_reservation
         ]
-        return jsonify(result)
+        return jsonify(result), 200
 
     except SQLAlchemyError:
         session.rollback()
-        return jsonify({'Error': 'Database error'})
+        return jsonify({'Error': 'Database error'}), 500
     finally:
         session.close()
 
@@ -96,19 +88,35 @@ def edit_reservation_time(reservation_id):
     session = SessionLocal()
     try:
         reservation = session.query(Reservation).filter(Reservation.id == reservation_id).first()
-        room = session.query(Room).filter(Room.id == reservation.room_id).first()
         if reservation:
             reservation.start_time = start_time
             reservation.end_time = end_time
-            room.start_time = start_time
-            room.end_time = end_time
         else:
-            return jsonify({'Error': 'reservation not found'})
+            return jsonify({'Error': 'reservation not found'}), 404
 
         session.commit()
-        return jsonify({'Success': 'Reservation has been updated'})
+        return jsonify({'Success': 'Reservation has been updated'}), 200
     except SQLAlchemyError:
         session.rollback()
-        return jsonify({'Error': 'Database error'})
+        return jsonify({'Error': 'Database error'}), 500
     finally:
         session.close()
+
+# WIP
+# @reservation_bp.route('/delete/<int:reservation_id>/', methods=['DELETE'])
+# def delete_reservation(reservation_id):
+#     session = SessionLocal()
+#
+#     try:
+#         reservation = session.query(Reservation).filter(Reservation.id == reservation_id).first()
+#         if not reservation:
+#             return jsonify({'Error': f'Reservation: {reservation_id} not found'}), 404
+#
+#         session.delete(reservation)
+#         session.commit()
+#         return jsonify({'Success': f'Reservation: {reservation_id} has been deleted'}), 200
+#     except SQLAlchemyError:
+#         session.rollback()
+#         return jsonify({'Error': 'Database error'}), 500
+#     finally:
+#         session.close()

@@ -20,10 +20,6 @@ class Room(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     room_number = Column(Integer, nullable=False)
     price_per_night = Column(Numeric(precision=10, scale=2), nullable=False)
-    is_reserved = Column(Boolean, nullable=False)
-    reserved_by = Column(String(45), nullable=True)
-    start_time = Column(DateTime, nullable=True)
-    end_time = Column(DateTime, nullable=True)
 
     reservations = relationship('Reservation', back_populates='room')
 
