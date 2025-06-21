@@ -48,3 +48,31 @@ def all_users():
         return jsonify({'Error': 'Database error'}), 500
     finally:
         session.close()
+
+
+@users_bp.route('/update_user', methods=['PUT'])
+def update_user():
+    data = request.get_json()
+    user_id = data['user_id']
+    last_name = data['last_name']
+    email = data['email']
+    phone_number = data['phone_number']
+
+    session = SessionLocal()
+    try:
+        user = session.query(User).filter(User.id == user_id).first()
+
+        if user:
+            user.last_name = last_name
+            user.email = email
+            user.phone_number = phone_number
+        else:
+            return jsonify({'Error': 'User not found'}), 404
+        session.commit()
+
+        return jsonify({'Succes': f'User: {user.last_name} has been updated'}), 200
+    except SQLAlchemyError:
+        session.rollback()
+        return jsonify({'Error', 'Database error'}), 500
+    finally:
+        session.close()
