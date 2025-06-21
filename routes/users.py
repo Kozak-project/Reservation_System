@@ -50,10 +50,9 @@ def all_users():
         session.close()
 
 
-@users_bp.route('/update_user', methods=['PUT'])
-def update_user():
+@users_bp.route('/update_user/<int:user_id>/', methods=['PUT'])
+def update_user(user_id):
     data = request.get_json()
-    user_id = data['user_id']
     last_name = data['last_name']
     email = data['email']
     phone_number = data['phone_number']
@@ -76,3 +75,20 @@ def update_user():
         return jsonify({'Error', 'Database error'}), 500
     finally:
         session.close()
+
+
+@users_bp.route('/delete_user/<int:user_id>/', methods=['DELETE'])
+def delete_user(user_id):
+    session = SessionLocal()
+    try:
+        user = session.query(User).filter(User.id == user_id).first()
+        session.delete(user)
+        session.commit()
+
+        return jsonify({'Success': f'User: {user.last_name} has been deleted'})
+    except SQLAlchemyError:
+        session.rollback()
+        return jsonify({'Error', 'Database error'}), 500
+    finally:
+        session.close()
+        
