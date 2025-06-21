@@ -5,10 +5,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 
 
-reservation_bp = Blueprint('reservation', __name__, url_prefix='/reservation')
+reservations_bp = Blueprint('reservation', __name__, url_prefix='/reservation')
 
 
-@reservation_bp.route('/add', methods=['POST'])
+@reservations_bp.route('/add', methods=['POST'])
 def add_reservation():
     data = request.get_json()
     if not data:
@@ -54,7 +54,7 @@ def add_reservation():
         session.close()
 
 
-@reservation_bp.route('/find_user/<int:user_id>/')
+@reservations_bp.route('/find_user/<int:user_id>/')
 def user_reservations(user_id):
     session = SessionLocal()
     try:
@@ -79,7 +79,7 @@ def user_reservations(user_id):
         session.close()
 
 
-@reservation_bp.route('/update/<int:reservation_id>/', methods=['PUT'])
+@reservations_bp.route('/update/<int:reservation_id>/', methods=['PUT'])
 def edit_reservation_time(reservation_id):
     data = request.get_json()
     start_time = datetime.fromisoformat(data['start_time'])
@@ -103,7 +103,7 @@ def edit_reservation_time(reservation_id):
         session.close()
 
 
-@reservation_bp.route('/delete/<int:reservation_id>/', methods=['DELETE'])
+@reservations_bp.route('/delete/<int:reservation_id>/', methods=['DELETE'])
 def delete_reservation(reservation_id):
     session = SessionLocal()
 
