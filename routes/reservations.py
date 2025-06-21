@@ -102,21 +102,21 @@ def edit_reservation_time(reservation_id):
     finally:
         session.close()
 
-# WIP
-# @reservation_bp.route('/delete/<int:reservation_id>/', methods=['DELETE'])
-# def delete_reservation(reservation_id):
-#     session = SessionLocal()
-#
-#     try:
-#         reservation = session.query(Reservation).filter(Reservation.id == reservation_id).first()
-#         if not reservation:
-#             return jsonify({'Error': f'Reservation: {reservation_id} not found'}), 404
-#
-#         session.delete(reservation)
-#         session.commit()
-#         return jsonify({'Success': f'Reservation: {reservation_id} has been deleted'}), 200
-#     except SQLAlchemyError:
-#         session.rollback()
-#         return jsonify({'Error': 'Database error'}), 500
-#     finally:
-#         session.close()
+
+@reservation_bp.route('/delete/<int:reservation_id>/', methods=['DELETE'])
+def delete_reservation(reservation_id):
+    session = SessionLocal()
+
+    try:
+        reservation = session.query(Reservation).filter(Reservation.id == reservation_id).first()
+        if not reservation:
+            return jsonify({'Error': f'Reservation: {reservation_id} not found'}), 404
+
+        session.delete(reservation)
+        session.commit()
+        return jsonify({'Success': f'Reservation: {reservation_id} has been deleted'}), 200
+    except SQLAlchemyError:
+        session.rollback()
+        return jsonify({'Error': 'Database error'}), 500
+    finally:
+        session.close()
