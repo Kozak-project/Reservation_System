@@ -69,7 +69,7 @@ def update_user(user_id):
             return jsonify({'Error': 'User not found'}), 404
         session.commit()
 
-        return jsonify({'Succes': f'User: {user.last_name} has been updated'}), 200
+        return jsonify({'Success': f'User: {user.last_name} has been updated'}), 200
     except SQLAlchemyError:
         session.rollback()
         return jsonify({'Error', 'Database error'}), 500
