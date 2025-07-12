@@ -50,8 +50,8 @@ def get_available_rooms():
         rooms = all_rooms()
         available_rooms = {}
         for room in rooms:
-            if not room.is_reserved:
-                available_rooms[room.room_number] = room.price_per_night
+            if not room.reservations:
+                available_rooms[room.room_number] = {'price_per_night':float(room.price_per_night)}
 
         return jsonify(available_rooms)
     except SQLAlchemyError:
