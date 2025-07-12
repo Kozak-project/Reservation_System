@@ -3,3 +3,6 @@ SQLAlchemy==2.0.30
 pymysql==1.1.1
 mysql-connector-python==9.3.0
 python-dotenv==1.1.0
+pytest==8.4.1
+pytest-mock==3.14.1
+Werkzeug==2.3.8
