@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
-from models import Reservation, User, Room
-from database import SessionLocal
+from src.models import Reservation, User
+from src.database import SessionLocal
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 

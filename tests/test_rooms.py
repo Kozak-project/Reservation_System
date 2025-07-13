@@ -1,7 +1,7 @@
 import pytest
 from flask import Flask
-from routes.rooms import rooms_bp
-from models import Room
+from src.routes.rooms import rooms_bp
+from src.models import Room
 
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def test_get_all_rooms(client, mocker):
         Room(room_number=102, price_per_night=200.0),
     ]
 
-    mocker.patch('routes.rooms.all_rooms', return_value=mock_rooms)
+    mocker.patch('src.routes.rooms.all_rooms', return_value=mock_rooms)
 
     response = client.get('/rooms/all_rooms')
 
@@ -37,7 +37,7 @@ def test_get_available_rooms(client, mocker):
         Room(room_number=102, price_per_night=200.0),
     ]
 
-    mocker.patch('routes.rooms.all_rooms', return_value=mock_rooms)
+    mocker.patch('src.routes.rooms.all_rooms', return_value=mock_rooms)
 
     response = client.get('/rooms/available_rooms')
 

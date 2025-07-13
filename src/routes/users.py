@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy.exc import SQLAlchemyError
-from models import User
-from database import SessionLocal
+from src.models import User
+from src.database import SessionLocal
 
 
 users_bp = Blueprint('users', __name__, url_prefix='/user')

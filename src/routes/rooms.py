@@ -1,7 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 from flask import Blueprint, jsonify, request
-from models import Room
-from database import SessionLocal
+from src.models import Room
+from src.database import SessionLocal
 
 
 rooms_bp = Blueprint('rooms', __name__, url_prefix='/rooms')
@@ -51,7 +51,7 @@ def get_available_rooms():
         available_rooms = {}
         for room in rooms:
             if not room.reservations:
-                available_rooms[room.room_number] = {'price_per_night':float(room.price_per_night)}
+                available_rooms[room.room_number] = {'price_per_night': float(room.price_per_night)}
 
         return jsonify(available_rooms)
     except SQLAlchemyError:
