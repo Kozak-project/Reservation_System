@@ -13,6 +13,23 @@ def client():
         yield client
 
 
+def test_add_room(client, mocker):
+    mock_session = mocker.Mock()
+    mocker.patch('src.routes.rooms.SessionLocal', return_value=mock_session)
+
+
+    response = client.post('/rooms/add_room', json={
+        'room_number': 201,
+        'price_per_night': 150.00
+    })
+
+    assert response.status_code == 201
+    assert response.get_json()['message'] == 'Room added successfully'
+    mock_session.add.assert_called()
+    mock_session.commit.assert_called()
+    mock_session.close.assert_called()
+
+
 def test_get_all_rooms(client, mocker):
     mock_rooms = [
         Room(room_number=101, price_per_night=150.0),
