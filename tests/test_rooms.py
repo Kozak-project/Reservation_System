@@ -64,3 +64,22 @@ def test_get_available_rooms(client, mocker):
         "101": {"price_per_night": 150.0},
         "102": {"price_per_night": 200.0}
     }
+
+
+def test_delete_room(client, mocker):
+    mock_room = mocker.Mock()
+    mock_session = mocker.Mock()
+    mock_query = mocker.Mock()
+    mock_query.filter.return_value.first.return_value = mock_room
+    mock_session.query.return_value = mock_query
+    room_id = 1
+
+    mocker.patch('src.routes.rooms.SessionLocal', return_value=mock_session)
+
+    response = client.delete(f'/rooms/delete_room/{room_id}/')
+
+    assert response.status_code == 200
+    assert response.get_json()['message'] == f'Room with ID: {room_id} deleted successfully'
+    mock_session.delete.assert_called_with(mock_room)
+    mock_session.commit.assert_called_once()
+    mock_session.close.assert_called_once()
