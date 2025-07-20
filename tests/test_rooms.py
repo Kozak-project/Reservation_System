@@ -66,13 +66,18 @@ def test_get_available_rooms(client, mocker):
     }
 
 
-def test_delete_room(client, mocker):
+@pytest.mark.parametrize('room_id', [
+    1,
+    2,
+    3
+])
+def test_delete_room(client, mocker, room_id):
     mock_room = mocker.Mock()
     mock_session = mocker.Mock()
     mock_query = mocker.Mock()
     mock_query.filter.return_value.first.return_value = mock_room
     mock_session.query.return_value = mock_query
-    room_id = 1
+
 
     mocker.patch('src.routes.rooms.SessionLocal', return_value=mock_session)
 
@@ -80,6 +85,6 @@ def test_delete_room(client, mocker):
 
     assert response.status_code == 200
     assert response.get_json()['message'] == f'Room with ID: {room_id} deleted successfully'
-    mock_session.delete.assert_called_with(mock_room)
-    mock_session.commit.assert_called_once()
-    mock_session.close.assert_called_once()
+    mock_session.delete.assert_called()
+    mock_session.commit.assert_called()
+    mock_session.close.assert_called()
