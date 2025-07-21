@@ -41,8 +41,11 @@ pip install -r requirements.txt
 Create a `.env` file in the project root:
 
 ```env
-DATABASE_URL=mysql+pymysql://user:password@localhost/dbname
-FLASK_ENV=development
+DB_USER=DB_USER
+DB_PASSWORD=DB_PASSWORD
+DB_HOST=DB_HOST
+DB_NAME=DB_NAME
+
 ```
 
 ### 5. Run the application
