@@ -64,4 +64,3 @@ def test_all_users(client, mocker):
             'user e-mail': 'john@example.com'
         }
     ]
-    
